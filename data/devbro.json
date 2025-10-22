@@ -1,0 +1,47 @@
+{
+  "activities": [
+    {
+      "id": 1761160866499.3323,
+      "date": "2024-01-01",
+      "commits": 5,
+      "pull_requests": 2,
+      "issues": 1,
+      "total_additions": 100,
+      "total_deletions": 50,
+      "created_at": "2025-10-22T19:21:06.499Z"
+    },
+    {
+      "id": 1761161232666.491,
+      "date": "2024-01-01",
+      "commits": 5,
+      "pull_requests": 2,
+      "issues": 1,
+      "total_additions": 100,
+      "total_deletions": 50,
+      "created_at": "2025-10-22T19:27:12.666Z"
+    }
+  ],
+  "projects": [
+    {
+      "id": 1761160866499.2346,
+      "name": "test-project",
+      "repo_url": "https://github.com/user/test-project",
+      "language": "TypeScript",
+      "last_commit_date": "2024-01-01T12:00:00Z",
+      "is_stale": 0,
+      "created_at": "2025-10-22T19:21:06.499Z"
+    },
+    {
+      "id": 1761161232667.511,
+      "name": "test-project",
+      "repo_url": "https://github.com/user/test-project",
+      "language": "TypeScript",
+      "last_commit_date": "2024-01-01T12:00:00Z",
+      "is_stale": 0,
+      "created_at": "2025-10-22T19:27:12.667Z"
+    }
+  ],
+  "rival_messages": [],
+  "challenges": [],
+  "trends": []
+}
