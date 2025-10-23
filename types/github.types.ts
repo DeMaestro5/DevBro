@@ -13,12 +13,12 @@ export interface GitHubRepo {
   name: string;
   full_name: string;
   html_url: string;
-  description: string;
-  language: string;
-  stargazers_count: number;
-  forks_count: number;
-  updated_at: string;
-  pushed_at: string;
+  description: string | null;
+  language: string | null | undefined;
+  stargazers_count: number | undefined;
+  forks_count: number | undefined;
+  updated_at: string | null | undefined;
+  pushed_at: string | null | undefined;
 }
 
 export interface GitHubCommit {
@@ -26,9 +26,9 @@ export interface GitHubCommit {
   commit: {
     message: string;
     author: {
-      name: string;
-      email: string;
-      date: string;
+      name: string | undefined;
+      email: string | undefined;
+      date: string | undefined;
     };
   };
   html_url: string;

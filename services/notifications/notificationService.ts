@@ -1,5 +1,5 @@
-import { logger } from '../utils/logger';
-import { NotificationMessage } from '../types/notification.types';
+import { logger } from '../../utils/logger';
+import { NotificationMessage } from '../../types/notification.types';
 import { EmailService } from './emailService';
 import { DiscordService } from './discordService';
 

@@ -19,7 +19,6 @@ export interface Config {
   discord: {
     webhookUrl: string;
   };
-  environment: string;
 }
 
 const requiredEnvVars = [
@@ -39,6 +38,9 @@ for (const envVar of requiredEnvVars) {
   }
 }
 
+export const logDirectory = process.env.LOG_DIR
+export const  environment = process.env.NODE_ENV 
+
 export const config: Config = {
   github: {
     token: process.env.GITHUB_TOKEN!,
@@ -55,5 +57,4 @@ export const config: Config = {
   discord: {
     webhookUrl: process.env.DISCORD_WEBHOOK_URL!
   },
-  environment: process.env.NODE_ENV || 'development'
 };

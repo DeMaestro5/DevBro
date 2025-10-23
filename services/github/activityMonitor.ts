@@ -1,15 +1,11 @@
-import { GitHubClient } from './githubClient';
-import { ActivityModel, Activity } from '../models/Activity';
-import { ProjectModel, Project } from '../models/Project';
-import { logger } from '../utils/logger';
-import { DateHelper } from '../utils/dateHelper';
+import { githubClient } from './githubClient';
+import { ActivityModel, Activity } from '../../models/Activity';
+import { ProjectModel } from '../../models/Project';
+import { logger } from '../../utils/logger';
+import { DateHelper } from '../../utils/dateHelper';
 
 export class ActivityMonitor {
-  private githubClient: GitHubClient;
-
-  constructor() {
-    this.githubClient = new GitHubClient();
-  }
+  private githubClient = githubClient;
 
   async monitorDailyActivity(): Promise<Activity> {
     try {
@@ -23,7 +19,9 @@ export class ActivityMonitor {
         return existingActivity;
       }
 
-      const activityStats = await this.githubClient.getActivityStats(yesterday);
+      const activityStats =
+        await this.githubClient.fetchActivityStat(yesterday);
+      console.log(activityStats);
       const activity = ActivityModel.create(activityStats);
 
       logger.info(`Recorded activity for ${yesterday}:`, activity);
@@ -65,7 +63,7 @@ export class ActivityMonitor {
     try {
       logger.info('Syncing repositories...');
 
-      const repos = await this.githubClient.getUserRepos();
+      const repos = await this.githubClient.FetchUserRepo();
 
       for (const repo of repos) {
         const existingProject = ProjectModel.findByName(repo.name);
@@ -76,7 +74,11 @@ export class ActivityMonitor {
             repo_url: repo.html_url,
             language: repo.language,
             last_commit_date: repo.pushed_at,
-            is_stale: DateHelper.isStale(repo.pushed_at) ? 1 : 0,
+            is_stale: repo.pushed_at
+              ? DateHelper.isStale(repo.pushed_at)
+                ? 1
+                : 0
+              : 0,
           });
         } else {
           // Create new project
@@ -85,7 +87,11 @@ export class ActivityMonitor {
             repo_url: repo.html_url,
             language: repo.language,
             last_commit_date: repo.pushed_at,
-            is_stale: DateHelper.isStale(repo.pushed_at) ? 1 : 0,
+            is_stale: repo.pushed_at
+              ? DateHelper.isStale(repo.pushed_at)
+                ? 1
+                : 0
+              : 0,
           });
         }
       }

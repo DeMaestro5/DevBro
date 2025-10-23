@@ -1,0 +1,1 @@
+{"version":3,"file":"emailService.d.ts","sourceRoot":"","sources":["../../../services/notifications/emailService.ts"],"names":[],"mappings":"AAIA,qBAAa,YAAY;IACvB,OAAO,CAAC,WAAW,CAAyB;;IAYtC,SAAS,CAAC,OAAO,EAAE;QACvB,EAAE,EAAE,MAAM,CAAC;QACX,OAAO,EAAE,MAAM,CAAC;QAChB,IAAI,EAAE,MAAM,CAAC;KACd,GAAG,OAAO,CAAC,IAAI,CAAC;IAmBjB,SAAS;;;;;CAGV"}

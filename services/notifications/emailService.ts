@@ -1,31 +1,35 @@
 import nodemailer from 'nodemailer';
-import { config } from '../config/env';
-import { logger } from '../utils/logger';
+import { config } from '../../config/env';
+import { logger } from '../../utils/logger';
 
 export class EmailService {
   private transporter: nodemailer.Transporter;
-  
+
   constructor() {
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: config.email.user,
-        pass: config.email.pass
-      }
+        pass: config.email.pass,
+      },
     });
   }
-  
-  async sendEmail(options: { to: string; subject: string; text: string }): Promise<void> {
+
+  async sendEmail(options: {
+    to: string;
+    subject: string;
+    text: string;
+  }): Promise<void> {
     try {
       logger.info(`Sending email to ${options.to}...`);
-      
+
       const mailOptions = {
         from: config.email.user,
         to: options.to,
         subject: options.subject,
-        text: options.text
+        text: options.text,
       };
-      
+
       await this.transporter.sendMail(mailOptions);
       logger.info('Email sent successfully');
     } catch (error) {
@@ -33,7 +37,7 @@ export class EmailService {
       throw error;
     }
   }
-  
+
   getConfig() {
     return config.email;
   }

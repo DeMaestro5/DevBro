@@ -1,9 +1,9 @@
-import cron from 'node-cron';
+import cron, { ScheduledTask } from 'node-cron';
 import { logger } from './logger';
 import { CRON_SCHEDULES } from '../config/constants';
 
 export class Scheduler {
-  private static jobs: Map<string, cron.ScheduledTask> = new Map();
+  private static jobs: Map<string, ScheduledTask> = new Map();
 
   static startScheduler(): void {
     logger.info('Starting DevBro scheduler...');
@@ -40,10 +40,7 @@ export class Scheduler {
     schedule: string,
     task: () => void,
   ): void {
-    const job = cron.schedule(schedule, task, {
-      scheduled: false,
-    });
-
+    const job = cron.schedule(schedule, task);
     this.jobs.set(name, job);
     job.start();
 

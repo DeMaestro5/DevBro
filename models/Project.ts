@@ -5,8 +5,8 @@ export interface Project {
   id?: number;
   name: string;
   repo_url?: string;
-  language?: string;
-  last_commit_date?: string;
+  language?: string | null;
+  last_commit_date?: string | null;
   is_stale: number;
   created_at?: string;
   updated_at?: string;
