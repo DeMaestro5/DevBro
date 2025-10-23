@@ -1,8 +1,12 @@
 import { Octokit } from '@octokit/rest';
-import Logger from '../../src/helpers/Logger';
-import { GitHubCommit, GitHubRepo, GitHubUser } from '../../types/github.types';
+import Logger from '../../helpers/Logger.js';
+import {
+  GitHubCommit,
+  GitHubRepo,
+  GitHubUser,
+} from '../../types/github.types.js';
 import { RequestError } from '@octokit/request-error';
-import { Activity } from '../../models/Activity';
+import { Activity } from '../../models/Activity.js';
 
 class GithubClient {
   private octokit: Octokit;
