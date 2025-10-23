@@ -2,7 +2,7 @@
 import { config } from '../../config/env';
 import { logger } from '../../utils/logger';
 import { AIMessage, AIResponse } from '../../types/ai.types';
-import Logger from '../../src/helpers/Logger';
+import Logger from '../../helpers/Logger';
 
 export class AIClient {
   private apiKey: string;

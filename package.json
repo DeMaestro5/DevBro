@@ -3,6 +3,7 @@
   "version": "2.0.1",
   "description": "The architecture for nodejs backend application. It is build on top of expressjs using typescript.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "npm run build && npm run serve",
     "serve": "node -r dotenv/config build/server.js",
@@ -16,7 +17,8 @@
     "eslint": "eslint . --ext .js,.ts",
     "upgrade": "npm update --save-dev && npm update --save",
     "upgrade-latest": "npx npm-check-updates -u && npm install ",
-    "test": "jest --forceExit --detectOpenHandles --coverage --verbose"
+    "test": "jest --forceExit --detectOpenHandles --coverage --verbose",
+    "test:github": "node --loader ts-node/esm scripts/testGithub.ts"
   },
   "repository": {
     "type": "git",
