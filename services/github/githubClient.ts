@@ -163,8 +163,46 @@ class GithubClient {
     try {
       Logger.info(`Fetching Github Activity Stats since: ${since}`);
 
+      const { data: repos } = await this.octokit.rest.repos.listForUser({
+        username: process.env.GITHUB_USERNAME!,
+      });
+
+      let totalCommits = 0;
+      let totalAdditions = 0;
+      let totalDeletions = 0;
+
+      for (const repo of repos) {
+        try {
+          const { data: commits } = await this.octokit.rest.repos.listCommits({
+            owner: repo.owner.login,
+            repo: repo.name,
+            since: since,
+            author: process.env.GiTHUB_USERNAME,
+          });
+
+          totalCommits += commits.length;
+
+          for (const commit of commits) {
+            try {
+              const { data: commitDetail } =
+                await this.octokit.rest.repos.getCommit({
+                  owner: repo.owner.login,
+                  repo: repo.name,
+                  ref: commit.sha,
+                });
+              totalAdditions += commitDetail.stats?.additions || 0;
+              totalDeletions += commitDetail.stats?.deletions || 0;
+            } catch (error) {
+              Logger.warn(`Failed to fetch commit details for ${commit.sha}`);
+            }
+          }
+        } catch (error) {
+          Logger.warn(`Failed to fetch commits for ${repo.name}`);
+        }
+      }
+
       const { data: events } =
-        await this.octokit.rest.activity.listEventsForAuthenticatedUser({
+        await this.octokit.rest.activity.listPublicEventsForUser({
           username: process.env.GITHUB_USERNAME!,
           per_page: 100,
         });
@@ -175,37 +213,10 @@ class GithubClient {
         return eventDate >= sinceDate;
       });
 
-      Logger.info(`Found ${recentEvents.length} events since ${since}`);
-
-      let totalCommits = 0;
       let totalPullRequests = 0;
       let totalIssue = 0;
-      let totalAdditions = 0;
-      let totalDeletions = 0;
 
       for (const event of recentEvents) {
-        if (event.type === 'PushEvent' && 'commits' in (event.payload || {})) {
-          const payload = event.payload as { commits: Array<{ sha: string }> };
-          const commits = payload.commits;
-          totalCommits += commits.length;
-
-          for (const commit of commits) {
-            try {
-              const [owner, repo] = event.repo.name.split('/');
-              const { data: commitDetail } =
-                await this.octokit.rest.repos.getCommit({
-                  owner,
-                  repo,
-                  ref: commit.sha,
-                });
-              totalAdditions += commitDetail.stats?.additions || 0;
-              totalDeletions += commitDetail.stats?.deletions || 0;
-            } catch (err) {
-              Logger.warn(`Failed to fetch commit details for ${commit.sha}`);
-            }
-          }
-        }
-
         if (event.type === 'PullRequestEvent') {
           totalPullRequests++;
         }
@@ -213,6 +224,7 @@ class GithubClient {
           totalIssue++;
         }
       }
+
       const activityStats: Activity = {
         date: since,
         commits: totalCommits,
