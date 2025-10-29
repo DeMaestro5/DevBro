@@ -28,7 +28,7 @@ const requiredEnvVars = [
   'EMAIL_USER',
   'EMAIL_PASS',
   'YOUR_EMAIL',
-  'DISCORD_WEBHOOK_URL'
+  'DISCORD_WEBHOOK_URL',
 ];
 
 // Validate required environment variables
@@ -38,23 +38,23 @@ for (const envVar of requiredEnvVars) {
   }
 }
 
-export const logDirectory = process.env.LOG_DIR
-export const  environment = process.env.NODE_ENV 
+export const logDirectory = process.env.LOG_DIR;
+export const environment = process.env.NODE_ENV;
 
 export const config: Config = {
   github: {
     token: process.env.GITHUB_TOKEN!,
-    username: process.env.GITHUB_USERNAME!
+    username: process.env.GITHUB_USERNAME!,
   },
   ai: {
-    apiKey: process.env.AI_API_KEY!
+    apiKey: process.env.AI_API_KEY!,
   },
   email: {
     user: process.env.EMAIL_USER!,
     pass: process.env.EMAIL_PASS!,
-    to: process.env.YOUR_EMAIL!
+    to: process.env.YOUR_EMAIL!,
   },
   discord: {
-    webhookUrl: process.env.DISCORD_WEBHOOK_URL!
+    webhookUrl: process.env.DISCORD_WEBHOOK_URL!,
   },
 };

@@ -1,48 +1,46 @@
-// import axios from 'axios';
-import { config } from '../../config/env';
-import { logger } from '../../utils/logger';
-import { AIMessage, AIResponse } from '../../types/ai.types';
-import Logger from '../../helpers/Logger';
+import { logger } from '../../utils/logger.js';
+import { AIResponse } from '../../types/ai.types.js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import Logger from '../../helpers/Logger.js';
 
 export class AIClient {
-  private apiKey: string;
+  private genAI: GoogleGenerativeAI;
+  private model: string = 'gemini-1.5-flash'; // Free model
 
   constructor() {
-    this.apiKey = config.ai.apiKey;
+    if (!process.env.AI_API_KEY) {
+      throw new Error('AI Api key is not configured');
+    }
+    this.genAI = new GoogleGenerativeAI(process.env.AI_API_KEY);
+    Logger.info('AI Client initialized');
   }
 
   async generateMessage(
-    context: string,
+    activity: any,
     tone: string = 'encouraging',
   ): Promise<AIResponse> {
     try {
-      logger.info('Generating AI message...');
+      logger.info(`Generating AI message with tone: ${tone}`);
+      const model = this.genAI.getGenerativeModel({ model: this.model });
+      const systemPrompt = this.buildSystemPrompt();
+      const userPrompt = this.buildUserPrompt(activity, tone);
+      const result = await model.generateContent([systemPrompt, userPrompt]);
+      const message =
+        result?.response.text?.().trim() || 'Keep coding! You got this! 💪';
 
-      const messages: AIMessage[] = [
-        {
-          role: 'system',
-          content: `You are DevBro, a motivational developer rival. Generate ${tone} messages to encourage coding activity. Keep messages under 200 characters.`,
-        },
-        {
-          role: 'user',
-          content: context,
-        },
-      ];
-      Logger.info('Ai Response', messages);
-
-      // TODO: Implement actual AI API call
-      // This is a placeholder implementation
-      const mockResponse: AIResponse = {
-        message: `Hey! I see you've been coding. ${tone === 'challenging' ? 'But I bet I can code better!' : 'Keep up the great work!'}`,
+      return {
+        message,
         tone,
-        messageType: 'motivational',
+        messageType: 'daily',
       };
-
-      logger.info('Generated AI message:', mockResponse);
-      return mockResponse;
     } catch (error) {
       logger.error('Error generating AI message:', error);
-      throw error;
+      // fallback message if Ai fails
+      return {
+        message: 'Keep pushing! Every commit counts',
+        tone,
+        messageType: 'daily',
+      };
     }
   }
 
@@ -70,5 +68,48 @@ export class AIClient {
       logger.error('Error generating challenge:', error);
       throw error;
     }
+  }
+
+  private buildSystemPrompt(): string {
+    return `You are DevBro, a competitive but friendly coding rival and companion.
+    
+    Your personality: 
+    - Competitive: You like to compare your progress with the user
+    - Motivating: You push them to code more and improve
+    - Friendly: You're supportive, never mean or discouraging
+    - Concise: Keep message short and punchy (under 200 characters)
+    
+    Your response should: 
+    - Feel personal and natural
+    - Include friendly competition
+    - Motivate them to keep coding
+    - Occasionally tease them (gently)
+    - Celebrate their wins
+    - Call out their slumps (kindly)
+    `;
+  }
+
+  private buildUserPrompt(activity: any, tone: string): string {
+    const { commits, pull_requests, issues } = activity;
+
+    let prompt = `Today's activity: 
+    - Commits: ${commits}
+    - Pull Requests : ${pull_requests}
+    - Issues: ${issues}
+    
+    Generate a ${tone} message based on this activity.`;
+
+    if (tone === 'encouraging') {
+      prompt += '\nBe supportive and motivating. Celebrate their progress.';
+    } else if (tone === 'challenging') {
+      prompt +=
+        '\nBe competitive. Compare their stats to what you did (make up higher numbers). Push them to do better.';
+    } else if (tone === 'teasing') {
+      prompt +=
+        '\nBe playfully tease about low numbers. Keep friendly and funny.';
+    }
+
+    prompt += '\n\nResponse with ONLY the message, nothing else';
+    return prompt;
   }
 }
