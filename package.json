@@ -18,7 +18,8 @@
     "upgrade": "npm update --save-dev && npm update --save",
     "upgrade-latest": "npx npm-check-updates -u && npm install ",
     "test": "jest --forceExit --detectOpenHandles --coverage --verbose",
-    "test:github": "node --loader ts-node/esm scripts/testGithub.ts"
+    "test:github": "node --loader ts-node/esm scripts/testGithub.ts",
+    "test:ai": "node --loader ts-node/esm scripts/testAi.ts"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,8 @@
   "author": "Stephen Ossiakeme",
   "license": "Apache-2.0",
   "dependencies": {
+    "@google/genai": "^1.27.0",
+    "@google/generative-ai": "^0.24.1",
     "@octokit/rest": "^22.0.0",
     "axios": "^1.6.5",
     "bcrypt": "^5.1.1",
