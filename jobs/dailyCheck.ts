@@ -25,12 +25,16 @@ export class DailyCheckJob {
       // Update project status
       await this.activityMonitor.updateProjectStatus();
 
-      // Generate AI message based on activity
-      const context = `Today's activity: ${activity.commits} commits, ${activity.pull_requests} PRs, ${activity.issues} issues`;
-      const aiResponse = await this.aiClient.generateMessage(
-        context,
-        'encouraging',
-      );
+      // Generate tone based on activity
+      let tone = 'encouraging';
+      if (activity.commits === 0 && activity.pull_requests === 0) {
+        tone = 'teasing';
+      } else if (activity.commits < 6) {
+        tone = 'challenging';
+      } else {
+        tone = 'encourage';
+      }
+      const aiResponse = await this.aiClient.generateMessage(activity, tone);
 
       // Save rival message
       RivalMessageModel.create({

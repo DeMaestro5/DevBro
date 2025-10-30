@@ -42,6 +42,15 @@ async function testAi() {
   const teasingMsg = await aiClient.generateMessage(noActivity, 'teasing');
   console.log('Response:', teasingMsg.message);
   console.log('');
+  //Test 4: Generate challenge
+  console.log('Test 4: Generate coding challenge');
+  const activity = {
+    commits: 5,
+    pull_requests: 2,
+    issues: 2,
+  };
+  const challenge = await aiClient.generateChallenge(activity);
+  console.log('Generate Coding Challenge:', challenge);
 
   console.log('✅ AI Client tests complete!');
 }
