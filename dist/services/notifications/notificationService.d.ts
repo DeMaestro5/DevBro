@@ -1,7 +1,6 @@
-import { NotificationMessage } from '../../types/notification.types';
+import { NotificationMessage } from '../../types/notification.types.js';
 export declare class NotificationService {
     private emailService;
-    private discordService;
     constructor();
     sendNotification(message: NotificationMessage): Promise<void>;
     private getColorByType;

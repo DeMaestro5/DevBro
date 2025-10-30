@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DateHelper = void 0;
-class DateHelper {
+export class DateHelper {
     static getToday() {
         return new Date().toISOString().split('T')[0];
     }
@@ -30,5 +27,4 @@ class DateHelper {
         return lastCommit < threshold;
     }
 }
-exports.DateHelper = DateHelper;
 //# sourceMappingURL=dateHelper.js.map

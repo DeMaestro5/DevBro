@@ -1,8 +1,8 @@
-import { ActivityModel } from '../models/Activity';
-import { ProjectModel } from '../models/Project';
-import { ChallengeModel } from '../models/Challenge';
-import { NotificationService } from '../services/notifications/notificationService';
-import { logger } from '../utils/logger';
+import { ActivityModel } from '../models/Activity.js';
+import { ProjectModel } from '../models/Project.js';
+import { ChallengeModel } from '../models/Challenge.js';
+import { NotificationService } from '../services/notifications/notificationService.js';
+import { logger } from '../utils/logger.js';
 // import { DateHelper } from '../utils/dateHelper';
 
 export class WeeklyReportJob {

@@ -1,30 +1,24 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.logger = void 0;
-const winston_1 = __importDefault(require("winston"));
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
+import winston from 'winston';
+import fs from 'fs';
+import path from 'path';
 // Create logs directory if it doesn't exist
-const logsDir = path_1.default.join(process.cwd(), 'logs');
-if (!fs_1.default.existsSync(logsDir)) {
-    fs_1.default.mkdirSync(logsDir, { recursive: true });
+const logsDir = path.join(process.cwd(), 'logs');
+if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
 }
-exports.logger = winston_1.default.createLogger({
+export const logger = winston.createLogger({
     level: 'info',
-    format: winston_1.default.format.combine(winston_1.default.format.timestamp(), winston_1.default.format.errors({ stack: true }), winston_1.default.format.json()),
+    format: winston.format.combine(winston.format.timestamp(), winston.format.errors({ stack: true }), winston.format.json()),
     transports: [
-        new winston_1.default.transports.Console({
-            format: winston_1.default.format.combine(winston_1.default.format.colorize(), winston_1.default.format.simple())
+        new winston.transports.Console({
+            format: winston.format.combine(winston.format.colorize(), winston.format.simple())
         }),
-        new winston_1.default.transports.File({
-            filename: path_1.default.join(logsDir, 'error.log'),
+        new winston.transports.File({
+            filename: path.join(logsDir, 'error.log'),
             level: 'error'
         }),
-        new winston_1.default.transports.File({
-            filename: path_1.default.join(logsDir, 'combined.log')
+        new winston.transports.File({
+            filename: path.join(logsDir, 'combined.log')
         })
     ]
 });

@@ -1,5 +1,5 @@
-import { DevBroApp } from './app';
-import { logger } from './utils/logger';
+import { DevBroApp } from './app.js';
+import { logger } from './utils/logger.js';
 
 const app = new DevBroApp();
 

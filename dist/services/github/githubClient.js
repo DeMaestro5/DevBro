@@ -1,12 +1,6 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.githubClient = void 0;
-const rest_1 = require("@octokit/rest");
-const Logger_1 = __importDefault(require("../../src/helpers/Logger"));
-const request_error_1 = require("@octokit/request-error");
+import { Octokit } from '@octokit/rest';
+import Logger from '../../helpers/Logger.js';
+import { RequestError } from '@octokit/request-error';
 class GithubClient {
     constructor() {
         if (!process.env.GITHUB_TOKEN) {
@@ -15,7 +9,7 @@ class GithubClient {
         if (!process.env.GITHUB_USERNAME) {
             throw new Error('Github username is not set');
         }
-        this.octokit = new rest_1.Octokit({
+        this.octokit = new Octokit({
             auth: process.env.GITHUB_TOKEN,
         });
     }
@@ -25,13 +19,13 @@ class GithubClient {
             return true;
         }
         catch (error) {
-            Logger_1.default.warn('Github health check failed', error);
+            Logger.warn('Github health check failed', error);
             return false;
         }
     }
     async fetchProfile() {
         try {
-            Logger_1.default.info('Fetching Github Profile');
+            Logger.info('Fetching Github Profile');
             const response = await this.octokit.rest.users.getByUsername({
                 username: process.env.GITHUB_USERNAME,
             });
@@ -44,7 +38,7 @@ class GithubClient {
                 followers: response.data.followers,
                 following: response.data.following,
             };
-            Logger_1.default.info('GitHub Profile Fetched Successfully', {
+            Logger.info('GitHub Profile Fetched Successfully', {
                 login: profile.login,
                 repos: profile.public_repos,
                 followers: profile.followers,
@@ -52,20 +46,20 @@ class GithubClient {
             return profile;
         }
         catch (error) {
-            if (error instanceof request_error_1.RequestError) {
-                Logger_1.default.error('Failed to fetch GitHub profile', {
+            if (error instanceof RequestError) {
+                Logger.error('Failed to fetch GitHub profile', {
                     error: error.message,
                     status: error.status,
                     rateLimit: error.response?.headers?.['x-ratelimit-remaining'],
                 });
                 throw new Error(`GitHub API error: ${error.message}`);
             }
-            Logger_1.default.error('Unexpected error while fetching GitHub profile', error);
+            Logger.error('Unexpected error while fetching GitHub profile', error);
             throw error;
         }
     }
     async FetchUserRepo() {
-        Logger_1.default.info('Fetching Github Repo');
+        Logger.info('Fetching Github Repo');
         try {
             const response = await this.octokit.rest.repos.listForUser({
                 username: process.env.GITHUB_USERNAME,
@@ -82,27 +76,27 @@ class GithubClient {
                 updated_at: repo.updated_at,
                 pushed_at: repo.pushed_at,
             }));
-            Logger_1.default.info('Github Repositories Fetched Successfully', {
+            Logger.info('Github Repositories Fetched Successfully', {
                 repositories: repositories.length,
             });
             return repositories;
         }
         catch (error) {
-            if (error instanceof request_error_1.RequestError) {
-                Logger_1.default.error('Failed to fetch GitHub Repo', {
+            if (error instanceof RequestError) {
+                Logger.error('Failed to fetch GitHub Repo', {
                     error: error.message,
                     status: error.status,
                     rateLimit: error.response?.headers?.['x-ratelimit-remaining'],
                 });
                 throw new Error(`GitHub API error: ${error.message}`);
             }
-            Logger_1.default.error('Unexpected error while fetching GitHub Repo', error);
+            Logger.error('Unexpected error while fetching GitHub Repo', error);
             throw error;
         }
     }
     async FetchRepoCommits(name) {
         try {
-            Logger_1.default.info('Fetching Github Commits');
+            Logger.info('Fetching Github Commits');
             const [owner, repo] = name.split('/');
             if (!owner || !repo) {
                 throw new Error(`Invalid repo name format: "${name}". Expected "owner/repo".`);
@@ -123,28 +117,62 @@ class GithubClient {
                 },
                 html_url: commit.html_url,
             }));
-            Logger_1.default.info('Commits fetched successfully', {
+            Logger.info('Commits fetched successfully', {
                 commits: commits.length,
             });
             return commits;
         }
         catch (error) {
-            if (error instanceof request_error_1.RequestError) {
-                Logger_1.default.error('Failed to fetch GitHub commits', {
+            if (error instanceof RequestError) {
+                Logger.error('Failed to fetch GitHub commits', {
                     error: error.message,
                     status: error.status,
                     rateLimit: error.response?.headers?.['x-ratelimit-remaining'],
                 });
                 throw new Error(`GitHub API error: ${error.message}`);
             }
-            Logger_1.default.error('Unexpected error while fetching GitHub commits', error);
+            Logger.error('Unexpected error while fetching GitHub commits', error);
             throw error;
         }
     }
     async fetchActivityStat(since) {
         try {
-            Logger_1.default.info(`Fetching Github Activity Stats since: ${since}`);
-            const { data: events } = await this.octokit.rest.activity.listEventsForAuthenticatedUser({
+            Logger.info(`Fetching Github Activity Stats since: ${since}`);
+            const { data: repos } = await this.octokit.rest.repos.listForUser({
+                username: process.env.GITHUB_USERNAME,
+            });
+            let totalCommits = 0;
+            let totalAdditions = 0;
+            let totalDeletions = 0;
+            for (const repo of repos) {
+                try {
+                    const { data: commits } = await this.octokit.rest.repos.listCommits({
+                        owner: repo.owner.login,
+                        repo: repo.name,
+                        since: since,
+                        author: process.env.GiTHUB_USERNAME,
+                    });
+                    totalCommits += commits.length;
+                    for (const commit of commits) {
+                        try {
+                            const { data: commitDetail } = await this.octokit.rest.repos.getCommit({
+                                owner: repo.owner.login,
+                                repo: repo.name,
+                                ref: commit.sha,
+                            });
+                            totalAdditions += commitDetail.stats?.additions || 0;
+                            totalDeletions += commitDetail.stats?.deletions || 0;
+                        }
+                        catch (error) {
+                            Logger.warn(`Failed to fetch commit details for ${commit.sha}`);
+                        }
+                    }
+                }
+                catch (error) {
+                    Logger.warn(`Failed to fetch commits for ${repo.name}`);
+                }
+            }
+            const { data: events } = await this.octokit.rest.activity.listPublicEventsForUser({
                 username: process.env.GITHUB_USERNAME,
                 per_page: 100,
             });
@@ -153,33 +181,9 @@ class GithubClient {
                 const eventDate = new Date(event.created_at || '');
                 return eventDate >= sinceDate;
             });
-            Logger_1.default.info(`Found ${recentEvents.length} events since ${since}`);
-            let totalCommits = 0;
             let totalPullRequests = 0;
             let totalIssue = 0;
-            let totalAdditions = 0;
-            let totalDeletions = 0;
             for (const event of recentEvents) {
-                if (event.type === 'PushEvent' && 'commits' in (event.payload || {})) {
-                    const payload = event.payload;
-                    const commits = payload.commits;
-                    totalCommits += commits.length;
-                    for (const commit of commits) {
-                        try {
-                            const [owner, repo] = event.repo.name.split('/');
-                            const { data: commitDetail } = await this.octokit.rest.repos.getCommit({
-                                owner,
-                                repo,
-                                ref: commit.sha,
-                            });
-                            totalAdditions += commitDetail.stats?.additions || 0;
-                            totalDeletions += commitDetail.stats?.deletions || 0;
-                        }
-                        catch (err) {
-                            Logger_1.default.warn(`Failed to fetch commit details for ${commit.sha}`);
-                        }
-                    }
-                }
                 if (event.type === 'PullRequestEvent') {
                     totalPullRequests++;
                 }
@@ -195,22 +199,22 @@ class GithubClient {
                 total_additions: totalAdditions,
                 total_deletions: totalDeletions,
             };
-            Logger_1.default.info('Activity stats calculated:', activityStats);
+            Logger.info('Activity stats calculated:', activityStats);
             return activityStats;
         }
         catch (error) {
-            if (error instanceof request_error_1.RequestError) {
-                Logger_1.default.error('Failed to fetch GitHub Activity', {
+            if (error instanceof RequestError) {
+                Logger.error('Failed to fetch GitHub Activity', {
                     error: error.message,
                     status: error.status,
                     rateLimit: error.response?.headers?.['x-ratelimit-remaining'],
                 });
                 throw new Error(`GitHub API error: ${error.message}`);
             }
-            Logger_1.default.error('Unexpected error while fetching GitHub Activity', error);
+            Logger.error('Unexpected error while fetching GitHub Activity', error);
             throw error;
         }
     }
 }
-exports.githubClient = new GithubClient();
+export const githubClient = new GithubClient();
 //# sourceMappingURL=githubClient.js.map

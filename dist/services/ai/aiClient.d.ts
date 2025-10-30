@@ -1,8 +1,11 @@
-import { AIResponse } from '../../types/ai.types';
+import { AIResponse } from '../../types/ai.types.js';
 export declare class AIClient {
-    private apiKey;
+    private genAI;
+    private model;
     constructor();
-    generateMessage(context: string, tone?: string): Promise<AIResponse>;
+    generateMessage(activity: any, tone?: string): Promise<AIResponse>;
     generateChallenge(activity: any): Promise<any>;
+    private buildSystemPrompt;
+    private buildUserPrompt;
 }
 //# sourceMappingURL=aiClient.d.ts.map

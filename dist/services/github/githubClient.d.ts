@@ -1,5 +1,5 @@
-import { GitHubCommit, GitHubRepo, GitHubUser } from '../../types/github.types';
-import { Activity } from '../../models/Activity';
+import { GitHubCommit, GitHubRepo, GitHubUser } from '../../types/github.types.js';
+import { Activity } from '../../models/Activity.js';
 declare class GithubClient {
     private octokit;
     constructor();
