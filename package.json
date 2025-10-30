@@ -19,7 +19,8 @@
     "upgrade-latest": "npx npm-check-updates -u && npm install ",
     "test": "jest --forceExit --detectOpenHandles --coverage --verbose",
     "test:github": "node --loader ts-node/esm scripts/testGithub.ts",
-    "test:ai": "node --loader ts-node/esm scripts/testAi.ts"
+    "test:ai": "node --loader ts-node/esm scripts/testAi.ts",
+    "test:DailyCheck": "node --loader ts-node/esm scripts/testDailyCheck.ts"
   },
   "repository": {
     "type": "git",

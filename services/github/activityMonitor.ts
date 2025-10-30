@@ -1,8 +1,8 @@
-import { githubClient } from './githubClient';
-import { ActivityModel, Activity } from '../../models/Activity';
-import { ProjectModel } from '../../models/Project';
-import { logger } from '../../utils/logger';
-import { DateHelper } from '../../utils/dateHelper';
+import { githubClient } from './githubClient.js';
+import { ActivityModel, Activity } from '../../models/Activity.js';
+import { ProjectModel } from '../../models/Project.js';
+import { logger } from '../../utils/logger.js';
+import { DateHelper } from '../../utils/dateHelper.js';
 
 export class ActivityMonitor {
   private githubClient = githubClient;

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { logger } from '../utils/logger';
+import { logger } from '../utils/logger.js';
 
 // Create data directory if it doesn't exist
 const dataDir = path.join(process.cwd(), 'data');
