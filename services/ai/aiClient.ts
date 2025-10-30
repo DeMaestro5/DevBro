@@ -5,7 +5,7 @@ import Logger from '../../helpers/Logger.js';
 
 export class AIClient {
   private genAI: GoogleGenerativeAI;
-  private model: string = 'gemini-1.5-flash'; // Free model
+  private model: string = 'gemini-2.5-flash'; // Free model
 
   constructor() {
     if (!process.env.AI_API_KEY) {
@@ -46,24 +46,41 @@ export class AIClient {
 
   async generateChallenge(activity: any): Promise<any> {
     try {
+      const model = this.genAI.getGenerativeModel({ model: this.model });
       logger.info('Generating coding challenge...');
-      console.log(activity);
 
-      // TODO: Implement challenge generation based on activity
-      const mockChallenge = {
-        title: 'Code Review Master',
-        description: 'Review 3 open source projects and submit meaningful PRs',
-        difficulty: 'medium',
-        estimatedTime: '2-3 hours',
-        requirements: [
-          'Find 3 open source projects',
-          'Submit at least 1 PR',
-          'Write meaningful comments',
-        ],
-      };
+      const prompt = `Based on this developer's recent activity: 
+       - ${activity.commits} commits
+       - ${activity.pull_requests} pull requests
+       - ${activity.issues} issues
+       
+       Generate a coding challenge that will help them improve. Include:
+       1. A catchy title
+       2. A clear description (2-3 sentences)
+       3. Difficulty level (easy/medium/hard)
+       4. Estimated time
+       5. 3-4 specific requirements
 
-      logger.info('Generated challenge:', mockChallenge);
-      return mockChallenge;
+       Format as JSON`;
+
+      const response = await model.generateContent(prompt);
+      const result = response?.response?.text().trim() || '';
+
+      try {
+        return JSON.parse(result);
+      } catch {
+        return {
+          title: 'Code Review Challenge',
+          description: result,
+          difficulty: 'medium',
+          estimatedTime: '2-3 hours',
+          requirements: [
+            'Complete the challenge',
+            'Write tests',
+            'Document your code',
+          ],
+        };
+      }
     } catch (error) {
       logger.error('Error generating challenge:', error);
       throw error;
