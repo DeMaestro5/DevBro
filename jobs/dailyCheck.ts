@@ -1,8 +1,8 @@
-import { ActivityMonitor } from '../services/github/activityMonitor';
-import { AIClient } from '../services/ai/aiClient';
-import { NotificationService } from '../services/notifications/notificationService';
-import { RivalMessageModel } from '../models/RivalMessage';
-import { logger } from '../utils/logger';
+import { ActivityMonitor } from '../services/github/activityMonitor.js';
+import { AIClient } from '../services/ai/aiClient.js';
+import { NotificationService } from '../services/notifications/notificationService.js';
+import { RivalMessageModel } from '../models/RivalMessage.js';
+import { logger } from '../utils/logger.js';
 
 export class DailyCheckJob {
   private activityMonitor: ActivityMonitor;
@@ -29,7 +29,7 @@ export class DailyCheckJob {
       let tone = 'encouraging';
       if (activity.commits === 0 && activity.pull_requests === 0) {
         tone = 'teasing';
-      } else if (activity.commits < 6) {
+      } else if (activity.commits < 3) {
         tone = 'challenging';
       } else {
         tone = 'encourage';

@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
-import { config } from '../../config/env';
-import { logger } from '../../utils/logger';
+import { config } from '../../config/env.js';
+import { logger } from '../../utils/logger.js';
 
 export class EmailService {
   private transporter: nodemailer.Transporter;

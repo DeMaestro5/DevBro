@@ -28,7 +28,6 @@ const requiredEnvVars = [
   'EMAIL_USER',
   'EMAIL_PASS',
   'YOUR_EMAIL',
-  'DISCORD_WEBHOOK_URL',
 ];
 
 // Validate required environment variables

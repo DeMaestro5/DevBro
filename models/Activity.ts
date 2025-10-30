@@ -1,5 +1,5 @@
-import { JsonDatabase } from '../config/database';
-import { logger } from '../utils/logger';
+import { JsonDatabase } from '../config/database.js';
+import { logger } from '../utils/logger.js';
 
 export interface Activity {
   id?: number;
