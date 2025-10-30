@@ -1,70 +1,119 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AIClient = void 0;
-// import axios from 'axios';
-const env_1 = require("../../config/env");
-const logger_1 = require("../../utils/logger");
-const Logger_1 = __importDefault(require("../../src/helpers/Logger"));
-class AIClient {
+import { logger } from '../../utils/logger.js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import Logger from '../../helpers/Logger.js';
+export class AIClient {
     constructor() {
-        this.apiKey = env_1.config.ai.apiKey;
+        this.model = 'gemini-2.5-flash'; // Free model
+        if (!process.env.AI_API_KEY) {
+            throw new Error('AI Api key is not configured');
+        }
+        this.genAI = new GoogleGenerativeAI(process.env.AI_API_KEY);
+        Logger.info('AI Client initialized');
     }
-    async generateMessage(context, tone = 'encouraging') {
+    async generateMessage(activity, tone = 'encouraging') {
         try {
-            logger_1.logger.info('Generating AI message...');
-            const messages = [
-                {
-                    role: 'system',
-                    content: `You are DevBro, a motivational developer rival. Generate ${tone} messages to encourage coding activity. Keep messages under 200 characters.`,
-                },
-                {
-                    role: 'user',
-                    content: context,
-                },
-            ];
-            Logger_1.default.info('Ai Response', messages);
-            // TODO: Implement actual AI API call
-            // This is a placeholder implementation
-            const mockResponse = {
-                message: `Hey! I see you've been coding. ${tone === 'challenging' ? 'But I bet I can code better!' : 'Keep up the great work!'}`,
+            logger.info(`Generating AI message with tone: ${tone}`);
+            const model = this.genAI.getGenerativeModel({ model: this.model });
+            const systemPrompt = this.buildSystemPrompt();
+            const userPrompt = this.buildUserPrompt(activity, tone);
+            const result = await model.generateContent([systemPrompt, userPrompt]);
+            const message = result?.response.text?.().trim() || 'Keep coding! You got this! 💪';
+            return {
+                message,
                 tone,
-                messageType: 'motivational',
+                messageType: 'daily',
             };
-            logger_1.logger.info('Generated AI message:', mockResponse);
-            return mockResponse;
         }
         catch (error) {
-            logger_1.logger.error('Error generating AI message:', error);
-            throw error;
+            logger.error('Error generating AI message:', error);
+            // fallback message if Ai fails
+            return {
+                message: 'Keep pushing! Every commit counts',
+                tone,
+                messageType: 'daily',
+            };
         }
     }
     async generateChallenge(activity) {
         try {
-            logger_1.logger.info('Generating coding challenge...');
-            console.log(activity);
-            // TODO: Implement challenge generation based on activity
-            const mockChallenge = {
-                title: 'Code Review Master',
-                description: 'Review 3 open source projects and submit meaningful PRs',
-                difficulty: 'medium',
-                estimatedTime: '2-3 hours',
-                requirements: [
-                    'Find 3 open source projects',
-                    'Submit at least 1 PR',
-                    'Write meaningful comments',
-                ],
-            };
-            logger_1.logger.info('Generated challenge:', mockChallenge);
-            return mockChallenge;
+            const model = this.genAI.getGenerativeModel({ model: this.model });
+            logger.info('Generating coding challenge...');
+            const prompt = `Based on this developer's recent activity: 
+       - ${activity.commits} commits
+       - ${activity.pull_requests} pull requests
+       - ${activity.issues} issues
+       
+       Generate a coding challenge that will help them improve. Include:
+       1. A catchy title
+       2. A clear description (2-3 sentences)
+       3. Difficulty level (easy/medium/hard)
+       4. Estimated time
+       5. 3-4 specific requirements
+
+       Format as JSON`;
+            const response = await model.generateContent(prompt);
+            const result = response?.response?.text().trim() || '';
+            try {
+                return JSON.parse(result);
+            }
+            catch {
+                return {
+                    title: 'Code Review Challenge',
+                    description: result,
+                    difficulty: 'medium',
+                    estimatedTime: '2-3 hours',
+                    requirements: [
+                        'Complete the challenge',
+                        'Write tests',
+                        'Document your code',
+                    ],
+                };
+            }
         }
         catch (error) {
-            logger_1.logger.error('Error generating challenge:', error);
+            logger.error('Error generating challenge:', error);
             throw error;
         }
     }
+    buildSystemPrompt() {
+        return `You are DevBro, a competitive but friendly coding rival and companion.
+    
+    Your personality: 
+    - Competitive: You like to compare your progress with the user
+    - Motivating: You push them to code more and improve
+    - Friendly: You're supportive, never mean or discouraging
+    - Concise: Keep message short and punchy (under 200 characters)
+    
+    Your response should: 
+    - Feel personal and natural
+    - Include friendly competition
+    - Motivate them to keep coding
+    - Occasionally tease them (gently)
+    - Celebrate their wins
+    - Call out their slumps (kindly)
+    `;
+    }
+    buildUserPrompt(activity, tone) {
+        const { commits, pull_requests, issues } = activity;
+        let prompt = `Today's activity: 
+    - Commits: ${commits}
+    - Pull Requests : ${pull_requests}
+    - Issues: ${issues}
+    
+    Generate a ${tone} message based on this activity.`;
+        if (tone === 'encouraging') {
+            prompt += '\nBe supportive and motivating. Celebrate their progress.';
+        }
+        else if (tone === 'challenging') {
+            prompt +=
+                '\nBe competitive. Compare their stats to what you did (make up higher numbers). Push them to do better.';
+        }
+        else if (tone === 'teasing') {
+            prompt +=
+                '\nBe playfully tease about low numbers. Keep friendly and funny.';
+        }
+        prompt += '\n\nResponse with ONLY the message, nothing else';
+        return prompt;
+    }
 }
-exports.AIClient = AIClient;
 //# sourceMappingURL=aiClient.js.map

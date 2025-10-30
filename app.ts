@@ -1,6 +1,6 @@
-import { initializeDatabase } from './config/database';
-import { Scheduler } from './utils/scheduler';
-import { logger } from './utils/logger';
+import { initializeDatabase } from './config/database.js';
+import { Scheduler } from './utils/scheduler.js';
+import { logger } from './utils/logger.js';
 
 export class DevBroApp {
   async start(): Promise<void> {

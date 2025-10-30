@@ -1,4 +1,4 @@
-import { Activity } from '../../models/Activity';
+import { Activity } from '../../models/Activity.js';
 export declare class ActivityMonitor {
     private githubClient;
     monitorDailyActivity(): Promise<Activity>;

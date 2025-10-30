@@ -1,59 +1,74 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Scheduler = void 0;
-const node_cron_1 = __importDefault(require("node-cron"));
-const logger_1 = require("./logger");
-const constants_1 = require("../config/constants");
-class Scheduler {
+import cron from 'node-cron';
+import { logger } from './logger.js';
+import { CRON_SCHEDULES } from '../config/constants.js';
+import { DailyCheckJob } from '../jobs/dailyCheck.js';
+import Logger from '../helpers/Logger.js';
+import { WeeklyReportJob } from '../jobs/weeklyReport.js';
+import { ProjectReminderJob } from '../jobs/projectReminder.js';
+export class Scheduler {
     static startScheduler() {
-        logger_1.logger.info('Starting DevBro scheduler...');
+        logger.info('Starting DevBro scheduler...');
         // Daily check at 9 AM
-        this.scheduleJob('dailyCheck', constants_1.CRON_SCHEDULES.DAILY_CHECK, () => {
-            logger_1.logger.info('Running daily check...');
-            // TODO: Import and run daily check job
+        this.scheduleJob('dailyCheck', CRON_SCHEDULES.DAILY_CHECK, async () => {
+            logger.info('Running daily check...');
+            try {
+                await new DailyCheckJob().execute();
+                Logger.info('Daily Check Finished');
+            }
+            catch (error) {
+                Logger.error('Daily Check Failed', error);
+            }
         });
         // Weekly report on Monday at 8 AM
-        this.scheduleJob('weeklyReport', constants_1.CRON_SCHEDULES.WEEKLY_REPORT, () => {
-            logger_1.logger.info('Running weekly report...');
-            // TODO: Import and run weekly report job
+        this.scheduleJob('weeklyReport', CRON_SCHEDULES.WEEKLY_REPORT, async () => {
+            logger.info('Running weekly report...');
+            try {
+                await new WeeklyReportJob().execute();
+                Logger.info('Weekly Check finished');
+            }
+            catch (error) {
+                Logger.error('Weekly Check Failed', error);
+            }
         });
-        // Trend updates every 6 hours
-        this.scheduleJob('trendUpdate', constants_1.CRON_SCHEDULES.TREND_UPDATE, () => {
-            logger_1.logger.info('Updating trends...');
-            // TODO: Import and run trend update job
-        });
+        // // Trend updates every 6 hours
+        // this.scheduleJob('trendUpdate', CRON_SCHEDULES.TREND_UPDATE, () => {
+        //   logger.info('Updating trends...');
+        //   // TODO: Import and run trend update job
+        // });
         // Project reminders at 5 PM
-        this.scheduleJob('projectReminder', constants_1.CRON_SCHEDULES.PROJECT_REMINDER, () => {
-            logger_1.logger.info('Sending project reminders...');
-            // TODO: Import and run project reminder job
+        this.scheduleJob('projectReminder', CRON_SCHEDULES.PROJECT_REMINDER, async () => {
+            logger.info('Sending project reminders...');
+            try {
+                await new ProjectReminderJob().execute();
+                Logger.info('Project Reminder Finished');
+            }
+            catch (error) {
+                Logger.error('Project Reminder Failed', error);
+            }
         });
-        logger_1.logger.info('DevBro scheduler started successfully');
+        logger.info('DevBro scheduler started successfully');
     }
     static scheduleJob(name, schedule, task) {
-        const job = node_cron_1.default.schedule(schedule, task);
+        const job = cron.schedule(schedule, task);
         this.jobs.set(name, job);
         job.start();
-        logger_1.logger.info(`Scheduled job '${name}' with schedule '${schedule}'`);
+        logger.info(`Scheduled job '${name}' with schedule '${schedule}'`);
     }
     static stopJob(name) {
         const job = this.jobs.get(name);
         if (job) {
             job.stop();
             this.jobs.delete(name);
-            logger_1.logger.info(`Stopped job '${name}'`);
+            logger.info(`Stopped job '${name}'`);
         }
     }
     static stopAllJobs() {
         this.jobs.forEach((job, name) => {
             job.stop();
-            logger_1.logger.info(`Stopped job '${name}'`);
+            logger.info(`Stopped job '${name}'`);
         });
         this.jobs.clear();
     }
 }
-exports.Scheduler = Scheduler;
 Scheduler.jobs = new Map();
 //# sourceMappingURL=scheduler.js.map

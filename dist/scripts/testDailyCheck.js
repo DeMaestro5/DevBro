@@ -1,16 +1,15 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const dailyCheck_1 = require("../jobs/dailyCheck");
-const logger_1 = require("../utils/logger");
+import 'dotenv/config';
+import { DailyCheckJob } from '../jobs/dailyCheck.js';
+import { logger } from '../utils/logger.js';
 async function testDailyCheck() {
     try {
-        logger_1.logger.info('Testing daily check job...');
-        const dailyCheckJob = new dailyCheck_1.DailyCheckJob();
+        logger.info('Testing daily check job...');
+        const dailyCheckJob = new DailyCheckJob();
         await dailyCheckJob.execute();
-        logger_1.logger.info('Daily check test completed successfully!');
+        logger.info('Daily check test completed successfully!');
     }
     catch (error) {
-        logger_1.logger.error('Daily check test failed:', error);
+        logger.error('Daily check test failed:', error);
         process.exit(1);
     }
 }

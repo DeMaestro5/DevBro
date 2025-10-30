@@ -1,6 +1,10 @@
 import cron, { ScheduledTask } from 'node-cron';
-import { logger } from './logger';
-import { CRON_SCHEDULES } from '../config/constants';
+import { logger } from './logger.js';
+import { CRON_SCHEDULES } from '../config/constants.js';
+import { DailyCheckJob } from '../jobs/dailyCheck.js';
+import Logger from '../helpers/Logger.js';
+import { WeeklyReportJob } from '../jobs/weeklyReport.js';
+import { ProjectReminderJob } from '../jobs/projectReminder.js';
 
 export class Scheduler {
   private static jobs: Map<string, ScheduledTask> = new Map();
@@ -9,28 +13,47 @@ export class Scheduler {
     logger.info('Starting DevBro scheduler...');
 
     // Daily check at 9 AM
-    this.scheduleJob('dailyCheck', CRON_SCHEDULES.DAILY_CHECK, () => {
+    this.scheduleJob('dailyCheck', CRON_SCHEDULES.DAILY_CHECK, async () => {
       logger.info('Running daily check...');
-      // TODO: Import and run daily check job
+      try {
+        await new DailyCheckJob().execute();
+        Logger.info('Daily Check Finished');
+      } catch (error) {
+        Logger.error('Daily Check Failed', error);
+      }
     });
 
     // Weekly report on Monday at 8 AM
-    this.scheduleJob('weeklyReport', CRON_SCHEDULES.WEEKLY_REPORT, () => {
+    this.scheduleJob('weeklyReport', CRON_SCHEDULES.WEEKLY_REPORT, async () => {
       logger.info('Running weekly report...');
-      // TODO: Import and run weekly report job
+      try {
+        await new WeeklyReportJob().execute();
+        Logger.info('Weekly Check finished');
+      } catch (error) {
+        Logger.error('Weekly Check Failed', error);
+      }
     });
 
-    // Trend updates every 6 hours
-    this.scheduleJob('trendUpdate', CRON_SCHEDULES.TREND_UPDATE, () => {
-      logger.info('Updating trends...');
-      // TODO: Import and run trend update job
-    });
+    // // Trend updates every 6 hours
+    // this.scheduleJob('trendUpdate', CRON_SCHEDULES.TREND_UPDATE, () => {
+    //   logger.info('Updating trends...');
+    //   // TODO: Import and run trend update job
+    // });
 
     // Project reminders at 5 PM
-    this.scheduleJob('projectReminder', CRON_SCHEDULES.PROJECT_REMINDER, () => {
-      logger.info('Sending project reminders...');
-      // TODO: Import and run project reminder job
-    });
+    this.scheduleJob(
+      'projectReminder',
+      CRON_SCHEDULES.PROJECT_REMINDER,
+      async () => {
+        logger.info('Sending project reminders...');
+        try {
+          await new ProjectReminderJob().execute();
+          Logger.info('Project Reminder Finished');
+        } catch (error) {
+          Logger.error('Project Reminder Failed', error);
+        }
+      },
+    );
 
     logger.info('DevBro scheduler started successfully');
   }
