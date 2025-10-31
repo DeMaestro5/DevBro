@@ -13,26 +13,36 @@ export class Scheduler {
     logger.info('Starting DevBro scheduler...');
 
     // Daily check at 9 AM
-    this.scheduleJob('dailyCheck', CRON_SCHEDULES.DAILY_CHECK, async () => {
-      logger.info('Running daily check...');
-      try {
-        await new DailyCheckJob().execute();
-        Logger.info('Daily Check Finished');
-      } catch (error) {
-        Logger.error('Daily Check Failed', error);
-      }
-    });
+    this.scheduleJob(
+      'dailyCheck',
+      CRON_SCHEDULES.DAILY_CHECK,
+      async () => {
+        logger.info('Running daily check...');
+        try {
+          await new DailyCheckJob().execute();
+          Logger.info('Daily Check Finished');
+        } catch (error) {
+          Logger.error('Daily Check Failed', error);
+        }
+      },
+      { timezone: 'Africa/Lagos' },
+    );
 
     // Weekly report on Monday at 8 AM
-    this.scheduleJob('weeklyReport', CRON_SCHEDULES.WEEKLY_REPORT, async () => {
-      logger.info('Running weekly report...');
-      try {
-        await new WeeklyReportJob().execute();
-        Logger.info('Weekly Check finished');
-      } catch (error) {
-        Logger.error('Weekly Check Failed', error);
-      }
-    });
+    this.scheduleJob(
+      'weeklyReport',
+      CRON_SCHEDULES.WEEKLY_REPORT,
+      async () => {
+        logger.info('Running weekly report...');
+        try {
+          await new WeeklyReportJob().execute();
+          Logger.info('Weekly Check finished');
+        } catch (error) {
+          Logger.error('Weekly Check Failed', error);
+        }
+      },
+      { timezone: 'Africa/Lagos' },
+    );
 
     // // Trend updates every 6 hours
     // this.scheduleJob('trendUpdate', CRON_SCHEDULES.TREND_UPDATE, () => {
@@ -53,6 +63,7 @@ export class Scheduler {
           Logger.error('Project Reminder Failed', error);
         }
       },
+      { timezone: 'Africa/Lagos' },
     );
 
     logger.info('DevBro scheduler started successfully');
@@ -62,8 +73,9 @@ export class Scheduler {
     name: string,
     schedule: string,
     task: () => void,
+    options?: { timezone?: string },
   ): void {
-    const job = cron.schedule(schedule, task);
+    const job = cron.schedule(schedule, task, options);
     this.jobs.set(name, job);
     job.start();
 
