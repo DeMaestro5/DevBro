@@ -1,12 +1,12 @@
 {
-  "name": "nodejs-backend-architecture",
+  "name": "DevBro",
   "version": "2.0.1",
-  "description": "The architecture for nodejs backend application. It is build on top of expressjs using typescript.",
+  "description": "A personal AI-powered coding rival that tracks your GitHub activity, challenges you daily, and keeps you accountable on your developer journey. Never code alone again.",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "npm run build && npm run serve",
-    "serve": "node -r dotenv/config build/server.js",
+    "serve": "TZ=Africa/Lagos node --loader ts-node/esm -r dotenv/config server.ts",
     "build": "npm run clean && npm run build-ts",
     "watch": "npx concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold\" \"tsc -w\" \"nodemon\"",
     "watch-node": "nodemon -r dotenv/config build/server.js",
