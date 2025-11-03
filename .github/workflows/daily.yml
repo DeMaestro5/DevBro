@@ -2,7 +2,7 @@ name: DevBro Daily
 
 on:
   schedule:
-    - cron: '0 9 * * *' # 09:00 UTC; adjust for your local time
+    - cron: '0 10 * * *' # 09:00 Africa/Lagos (UTC+1)
   workflow_dispatch: {}
 
 jobs:
@@ -14,14 +14,13 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci
-      - run: npm run build
-      - name: Run Daily Check
-        run: node dist/scripts/testDailyCheck.js
+      - name: Run Daily Check (TS directly)
+        run: npx ts-node --esm scripts/testDailyCheck.ts
         env:
           NODE_ENV: production
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_DEVBRO }}
-          GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME_DEVBRO }}
-          AI_API_KEY: ${{ secrets.AI_API_KEY_DEVBRO }}
-          EMAIL_USER: ${{ secrets.EMAIL_USER_DEVBRO }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS_DEVBRO }}
-          YOUR_EMAIL: ${{ secrets.YOUR_EMAIL_DEVBRO }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+          GITHUB_USERNAME: ${{ secrets.GH_USERNAME}}
+          AI_API_KEY: ${{ secrets.AI_API_KEY}}
+          EMAIL_USER: ${{ secrets.EMAIL_USER}}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS}}
+          YOUR_EMAIL: ${{ secrets.YOUR_EMAIL}}
