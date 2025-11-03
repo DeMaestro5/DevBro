@@ -1,5 +1,5 @@
 export const CRON_SCHEDULES = {
-  DAILY_CHECK: '0 11 * * *', // 9 AM daily
+  DAILY_CHECK: '0 18 * * *', // 7 PM daily
   WEEKLY_REPORT: '0 8 * * 1', // 8 AM Monday
   TREND_UPDATE: '0 */6 * * *', // Every 6 hours
   PROJECT_REMINDER: '0 17 * * *', // 5 PM daily
