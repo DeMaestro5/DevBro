@@ -18,7 +18,7 @@ export class Scheduler {
             catch (error) {
                 Logger.error('Daily Check Failed', error);
             }
-        });
+        }, { timezone: 'Africa/Lagos' });
         // Weekly report on Monday at 8 AM
         this.scheduleJob('weeklyReport', CRON_SCHEDULES.WEEKLY_REPORT, async () => {
             logger.info('Running weekly report...');
@@ -29,7 +29,7 @@ export class Scheduler {
             catch (error) {
                 Logger.error('Weekly Check Failed', error);
             }
-        });
+        }, { timezone: 'Africa/Lagos' });
         // // Trend updates every 6 hours
         // this.scheduleJob('trendUpdate', CRON_SCHEDULES.TREND_UPDATE, () => {
         //   logger.info('Updating trends...');
@@ -45,11 +45,11 @@ export class Scheduler {
             catch (error) {
                 Logger.error('Project Reminder Failed', error);
             }
-        });
+        }, { timezone: 'Africa/Lagos' });
         logger.info('DevBro scheduler started successfully');
     }
-    static scheduleJob(name, schedule, task) {
-        const job = cron.schedule(schedule, task);
+    static scheduleJob(name, schedule, task, options) {
+        const job = cron.schedule(schedule, task, options);
         this.jobs.set(name, job);
         job.start();
         logger.info(`Scheduled job '${name}' with schedule '${schedule}'`);

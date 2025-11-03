@@ -1,0 +1,27 @@
+services:
+  - type: worker
+    name: devbro-worker
+    env: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: node dist/server.js
+    autoDeploy: true
+    envVars:
+      # Set these in Render dashboard or via 'fromSecret' if you use Render Secrets
+      - key: NODE_ENV
+        value: production
+      # Example keys (define real values in dashboard)
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_USERNAME
+        sync: false
+      - key: AI_API_KEY
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: YOUR_EMAIL
+        sync: false
+      - key: DISCORD_WEBHOOK_URL
+        sync: false
