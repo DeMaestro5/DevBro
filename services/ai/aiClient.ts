@@ -1,4 +1,3 @@
-import { logger } from '../../utils/logger.js';
 import { AIResponse } from '../../types/ai.types.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import Logger from '../../helpers/Logger.js';
@@ -20,7 +19,7 @@ export class AIClient {
     tone: string = 'encouraging',
   ): Promise<AIResponse> {
     try {
-      logger.info(`Generating AI message with tone: ${tone}`);
+      Logger.info(`Generating AI message with tone: ${tone}`);
       const model = this.genAI.getGenerativeModel({ model: this.model });
       const systemPrompt = this.buildSystemPrompt();
       const userPrompt = this.buildUserPrompt(activity, tone);
@@ -34,7 +33,7 @@ export class AIClient {
         messageType: 'daily',
       };
     } catch (error) {
-      logger.error('Error generating AI message:', error);
+      Logger.error('Error generating AI message:', error);
       // fallback message if Ai fails
       return {
         message: 'Keep pushing! Every commit counts',
@@ -47,7 +46,7 @@ export class AIClient {
   async generateChallenge(activity: any): Promise<any> {
     try {
       const model = this.genAI.getGenerativeModel({ model: this.model });
-      logger.info('Generating coding challenge...');
+      Logger.info('Generating coding challenge...');
 
       const prompt = `Based on this developer's recent activity: 
        - ${activity.commits} commits
@@ -64,11 +63,17 @@ export class AIClient {
        Format as JSON`;
 
       const response = await model.generateContent(prompt);
-      const result = response?.response?.text().trim() || '';
+      let result = response?.response?.text().trim() || '';
+
+      result = result
+        .replace(/```json/g, '')
+        .replace(/```/g, '')
+        .trim();
 
       try {
         return JSON.parse(result);
       } catch {
+        Logger.warn('Invalid JSON from model. Returning formatted text.');
         return {
           title: 'Code Review Challenge',
           description: result,
@@ -82,7 +87,7 @@ export class AIClient {
         };
       }
     } catch (error) {
-      logger.error('Error generating challenge:', error);
+      Logger.error('Error generating challenge:', error);
       throw error;
     }
   }

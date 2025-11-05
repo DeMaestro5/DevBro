@@ -15,7 +15,7 @@ jobs:
           node-version: '20'
       - run: npm ci
       - name: Run Daily Check (TS directly)
-        run: node dist/scripts/testDailyCheck.js
+        run: node dist/scripts/dailyCheck.js
         env:
           TZ: Africa/Lagos
           NODE_ENV: production
