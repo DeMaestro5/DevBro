@@ -20,7 +20,8 @@
     "test": "jest --forceExit --detectOpenHandles --coverage --verbose",
     "test:github": "node --loader ts-node/esm scripts/testGithub.ts",
     "test:ai": "node --loader ts-node/esm scripts/testAi.ts",
-    "test:DailyCheck": "node --loader ts-node/esm scripts/testDailyCheck.ts"
+    "test:dailyCheck": "node --loader ts-node/esm scripts/dailyCheck.ts",
+    "test:dailyChallenge": "node --loader ts-node/esm scripts/dailyChallenge.ts"
   },
   "repository": {
     "type": "git",
