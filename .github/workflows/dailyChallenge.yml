@@ -1,4 +1,4 @@
-name: DevBro Daily
+name: DevBro Daily Challenge
 
 on:
   schedule:
