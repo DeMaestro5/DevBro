@@ -1,4 +1,4 @@
-name: DevBro Daily
+name: DevBro Daily Check
 
 on:
   schedule:
