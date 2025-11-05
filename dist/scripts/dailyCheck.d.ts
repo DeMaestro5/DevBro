@@ -1,2 +1,2 @@
 import 'dotenv/config';
-//# sourceMappingURL=testDailyCheck.d.ts.map
+//# sourceMappingURL=dailyCheck.d.ts.map
