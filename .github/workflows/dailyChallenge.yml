@@ -2,7 +2,7 @@ name: DevBro Daily Challenge
 
 on:
   schedule:
-    - cron: '0 8 * * *' # 07:00 PM Africa/Lagos (UTC+1)
+    - cron: '0 13 25 * *' # 07:00 PM Africa/Lagos (UTC+1)
   workflow_dispatch: {}
 
 jobs:
