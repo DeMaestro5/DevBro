@@ -31,7 +31,6 @@ export class Scheduler {
 
     logger.info('Starting DevBro scheduler...');
 
-    // Daily check at 9 AM
     this.scheduleJob(
       'dailyChallenge',
       CRON_SCHEDULES.DAILY_CHALLENGE,
