@@ -5,6 +5,7 @@ import { DailyCheckJob } from '../jobs/dailyCheck.js';
 import Logger from '../helpers/Logger.js';
 import { WeeklyReportJob } from '../jobs/weeklyReport.js';
 import { ProjectReminderJob } from '../jobs/projectReminder.js';
+import { DailyChallengeJob } from '../jobs/dailyChallenge.js';
 
 export class Scheduler {
   private static jobs: Map<string, ScheduledTask> = new Map();
@@ -23,6 +24,24 @@ export class Scheduler {
           Logger.info('Daily Check Finished');
         } catch (error) {
           Logger.error('Daily Check Failed', error);
+        }
+      },
+      { timezone: 'Africa/Lagos' },
+    );
+
+    logger.info('Starting DevBro scheduler...');
+
+    // Daily check at 9 AM
+    this.scheduleJob(
+      'dailyChallenge',
+      CRON_SCHEDULES.DAILY_CHALLENGE,
+      async () => {
+        logger.info('Running daily challenge...');
+        try {
+          await new DailyChallengeJob().execute();
+          Logger.info('Daily Challenge Finished');
+        } catch (error) {
+          Logger.error('Daily Challenge Failed', error);
         }
       },
       { timezone: 'Africa/Lagos' },
